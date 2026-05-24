@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#2563eb"/>
+  <title>Calendar Sync PWA</title>
+  <link rel="manifest" href="./manifest.json"/>
+  <link rel="stylesheet" href="./css/styles.css"/>
+</head>
+<body>
+
+<div id="loading-overlay" class="loading-overlay hidden">
+  <div class="spinner"></div>
+  <p>Loading...</p>
+</div>
+
+<header class="topbar">
+  <h1>Calendar Sync</h1>
+
+  <div class="topbar-actions">
+    <button id="sign-in-btn" class="btn">Sign In</button>
+    <button id="sign-out-btn" class="btn hidden">Sign Out</button>
+  </div>
+</header>
+
+<main class="app-layout">
+
+  <aside class="sidebar">
+    <button id="new-event-btn" class="btn primary">
+      + New Event
+    </button>
+
+    <div class="month-controls">
+      <button id="prev-btn" class="btn">←</button>
+      <h2 id="month-label"></h2>
+      <button id="next-btn" class="btn">→</button>
+    </div>
+  </aside>
+
+  <section class="calendar-section">
+
+    <div class="weekday-row">
+      <div>Sun</div>
+      <div>Mon</div>
+      <div>Tue</div>
+      <div>Wed</div>
+      <div>Thu</div>
+      <div>Fri</div>
+      <div>Sat</div>
+    </div>
+
+    <div id="calendar" class="calendar-grid"></div>
+
+  </section>
+
+</main>
+
+<dialog id="event-modal">
+  <form id="event-form" method="dialog">
+    <h2>Create Event</h2>
+
+    <label>
+      Title
+      <input type="text" id="event-title" required />
+    </label>
+
+    <label>
+      Date
+      <input type="date" id="event-date" required />
+    </label>
+
+    <label>
+      Time
+      <input type="time" id="event-time" required />
+    </label>
+
+    <div class="modal-actions">
+      <button type="button" id="close-modal-btn" class="btn">
+        Cancel
+      </button>
+
+      <button type="submit" class="btn primary">
+        Save Event
+      </button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module" src="./js/app.js"></script>
+
+</body>
+</html>
