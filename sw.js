@@ -1,25 +1,101 @@
+const CACHE_NAME = 'calendar-sync-v2';
 
-const CACHE_NAME = 'calendar-sync-v1';
+const FILES_TO_CACHE = [
 
-const FILES = [
   './',
   './index.html',
   './css/styles.css',
-  './js/app.js'
+  './js/app.js',
+  './js/supabase.js',
+  './manifest.json'
 ];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(FILES);
-    })
-  );
-});
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
-  );
-});
+/*
+|--------------------------------------------------------------------------
+| INSTALL
+|--------------------------------------------------------------------------
+*/
+
+self.addEventListener(
+
+  'install',
+
+  event => {
+
+    event.waitUntil(
+
+      caches.open(CACHE_NAME)
+
+        .then(cache => {
+
+          return cache.addAll(
+            FILES_TO_CACHE
+          );
+        })
+    );
+
+    self.skipWaiting();
+  }
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ACTIVATE
+|--------------------------------------------------------------------------
+*/
+
+self.addEventListener(
+
+  'activate',
+
+  event => {
+
+    event.waitUntil(
+
+      caches.keys()
+
+        .then(keys => {
+
+          return Promise.all(
+
+            keys.map(key => {
+
+              if (key !== CACHE_NAME) {
+
+                return caches.delete(key);
+              }
+            })
+          );
+        })
+    );
+
+    self.clients.claim();
+  }
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| FETCH
+|--------------------------------------------------------------------------
+*/
+
+self.addEventListener(
+
+  'fetch',
+
+  event => {
+
+    event.respondWith(
+
+      caches.match(event.request)
+
+        .then(response => {
+
+          return response || fetch(event.request);
+        })
+    );
+  }
+);
