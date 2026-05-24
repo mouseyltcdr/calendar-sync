@@ -39,6 +39,9 @@ const prevBtn =
 const nextBtn =
   document.getElementById('next-btn');
 
+const offlineBanner =
+  document.getElementById('offline-banner');
+
 const loadingOverlay =
   document.getElementById('loading-overlay');
 
@@ -290,6 +293,31 @@ function renderCalendar() {
     cell.className =
       'calendar-cell';
 
+    const dateString =
+      new Date(
+        year,
+        month,
+        day
+      )
+
+      .toISOString()
+
+      .split('T')[0];
+    
+      const today =
+        new Date()
+
+          .toISOString()
+
+          .split('T')[0];
+
+      if (dateString === today) {
+
+        cell.classList.add(
+          'today'
+        );
+      }
+
     const label =
       document.createElement(
         'div'
@@ -305,25 +333,31 @@ function renderCalendar() {
       label
     );
 
-    const dateString =
-      new Date(
-        year,
-        month,
-        day
-      )
-
-      .toISOString()
-
-      .split('T')[0];
 
     const dayEvents =
-      events.filter(
 
-        event =>
+      events
 
-          event.event_date ===
-          dateString
-      );
+        .filter(
+
+          event =>
+
+            event.event_date ===
+            dateString
+        )
+
+        .sort(
+
+          (a, b) => {
+
+            return (
+              (a.event_time || '')
+                .localeCompare(
+                  b.event_time || ''
+                )
+            );
+          }
+        );
 
     dayEvents.forEach(
 
@@ -371,6 +405,8 @@ function renderCalendar() {
               'hidden'
             );
 
+            newEventBtn.textContent = 'Edit Event';
+            
             eventModal.showModal();
           }
         );
@@ -632,6 +668,8 @@ newEventBtn.addEventListener(
     deleteEventBtn.classList.add(
       'hidden'
     );
+
+    newEventBtn.textContent = 'Create Event';
 
     eventModal.showModal();
   }
@@ -971,6 +1009,39 @@ supabase.auth.onAuthStateChange(
   }
 );
 
+/*
+|--------------------------------------------------------------------------
+| ONLINE / OFFLINE STATUS
+|--------------------------------------------------------------------------
+*/
+
+function updateOnlineStatus() {
+
+  if (navigator.onLine) {
+
+    offlineBanner.classList.add(
+      'hidden'
+    );
+
+  } else {
+
+    offlineBanner.classList.remove(
+      'hidden'
+    );
+  }
+}
+
+window.addEventListener(
+  'online',
+  updateOnlineStatus
+);
+
+window.addEventListener(
+  'offline',
+  updateOnlineStatus
+);
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -1031,6 +1102,8 @@ window.addEventListener(
       await loadEvents();
 
       renderCalendar();
+
+      updateOnlineStatus();
 
     } catch (error) {
 

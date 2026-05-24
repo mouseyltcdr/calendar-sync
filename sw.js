@@ -1,13 +1,16 @@
-const CACHE_NAME = 'calendar-sync-v3';
+const CACHE_NAME =
+  'calendar-sync-v4';
 
-const FILES_TO_CACHE = [
+const ASSETS = [
 
   './',
   './index.html',
   './css/styles.css',
   './js/app.js',
   './js/supabase.js',
-  './manifest.json'
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 
@@ -30,7 +33,7 @@ self.addEventListener(
         .then(cache => {
 
           return cache.addAll(
-            FILES_TO_CACHE
+            ASSETS
           );
         })
     );
@@ -62,9 +65,15 @@ self.addEventListener(
 
             keys.map(key => {
 
-              if (key !== CACHE_NAME) {
+              if (
 
-                return caches.delete(key);
+                key !== CACHE_NAME
+
+              ) {
+
+                return caches.delete(
+                  key
+                );
               }
             })
           );
@@ -90,12 +99,26 @@ self.addEventListener(
 
     event.respondWith(
 
-      caches.match(event.request)
+      caches.match(
+        event.request
+      )
 
-        .then(response => {
+      .then(response => {
 
-          return response || fetch(event.request);
-        })
+        return (
+
+          response ||
+
+          fetch(event.request)
+
+            .catch(() => {
+
+              return caches.match(
+                './index.html'
+              );
+            })
+        );
+      })
     );
   }
 );
