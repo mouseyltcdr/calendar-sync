@@ -490,20 +490,29 @@ signInBtn.addEventListener(
 
   async () => {
 
+    const email =
+      prompt('Email');
+
+    if (!email) return;
+
+    const password =
+      prompt('Password');
+
+    if (!password) return;
+
+    showLoading();
+
     try {
 
-      const email =
-        prompt('Email');
+      /*
+      |--------------------------------------------------------------------------
+      | SIGN IN
+      |--------------------------------------------------------------------------
+      */
 
-      if (!email) return;
+      const {
 
-      const password =
-        prompt('Password');
-
-      if (!password) return;
-
-      let {
-
+        data,
         error
 
       } = await supabase.auth.signInWithPassword({
@@ -514,50 +523,107 @@ signInBtn.addEventListener(
 
       /*
       |--------------------------------------------------------------------------
-      | AUTO SIGNUP
+      | SIGN IN FAILED
       |--------------------------------------------------------------------------
       */
 
       if (error) {
 
-        const create =
-          confirm(
-            'Account not found.\nCreate account?'
-          );
+        console.error(error);
 
-        if (!create) return;
+        /*
+        |--------------------------------------------------------------------------
+        | INVALID LOGIN
+        |--------------------------------------------------------------------------
+        */
 
-        const signupResult =
-          await supabase.auth.signUp({
+        if (
+
+          error.message.includes(
+            'Invalid login credentials'
+          )
+
+        ) {
+
+          const signup =
+            confirm(
+              'Account not found.\nCreate account?'
+            );
+
+          if (!signup) {
+
+            hideLoading();
+
+            return;
+          }
+
+          /*
+          |--------------------------------------------------------------------------
+          | SIGN UP
+          |--------------------------------------------------------------------------
+          */
+
+          const {
+
+            error: signupError
+
+          } = await supabase.auth.signUp({
 
             email,
             password
           });
 
-        if (signupResult.error) {
+          if (signupError) {
+
+            console.error(
+              signupError
+            );
+
+            alert(
+              signupError.message
+            );
+
+            hideLoading();
+
+            return;
+          }
 
           alert(
-            signupResult.error.message
+            'Account created.\nCheck your email for confirmation.'
           );
+
+          hideLoading();
 
           return;
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | OTHER AUTH ERROR
+        |--------------------------------------------------------------------------
+        */
+
         alert(
-          'Account created.\nPlease sign in.'
+          error.message
         );
+
+        hideLoading();
 
         return;
       }
 
-      const {
+      /*
+      |--------------------------------------------------------------------------
+      | SIGN IN SUCCESS
+      |--------------------------------------------------------------------------
+      */
 
-        data: { session }
+      signInBtn.classList.add(
+        'hidden'
+      );
 
-      } = await supabase.auth.getSession();
-
-      updateAuthUI(
-        session
+      signOutBtn.classList.remove(
+        'hidden'
       );
 
       await loadEvents();
@@ -574,6 +640,14 @@ signInBtn.addEventListener(
         'Sign in error',
         error
       );
+
+      alert(
+        'Unexpected authentication error'
+      );
+
+    } finally {
+
+      hideLoading();
     }
   }
 );
