@@ -40,6 +40,14 @@ body {
   padding: 1rem;
   background: white;
   border-right: 1px solid #d1d5db;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 1rem;
+
+  align-items: stretch;
 }
 
 .calendar-section {
@@ -54,8 +62,35 @@ body {
 .month-controls {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 1rem;
+  justify-content: center;
+
+  gap: 0.75rem;
+
+  margin-top: 0.5rem;
+}
+
+.view-buttons {
+
+  display: flex;
+
+  gap: 0.5rem;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+}
+
+#month-label {
+
+  text-align: center;
+
+  font-weight: bold;
+
+  font-size: 1.2rem;
+
+  line-height: 1.2;
+
+  min-width: 100px;
 }
 
 .weekday-row {
@@ -247,6 +282,22 @@ body {
   cursor: pointer;
 }
 
+#prev-btn,
+#next-btn {
+
+  width: 40px;
+
+  height: 40px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
 .primary {
   background: #2563eb;
   color: white;
@@ -337,6 +388,16 @@ body {
   .week-grid {
 
     grid-template-columns: 1fr;
+  }
+
+  .month-controls {
+
+  justify-content: center;
+}
+
+  #month-label {
+
+    min-width: auto;
   }
 
   .week-column {
