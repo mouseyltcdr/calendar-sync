@@ -529,7 +529,11 @@ signInBtn.addEventListener(
 
       if (error) {
 
-        console.error(error);
+        console.error(
+          'AUTH ERROR:',
+          error.message,
+          error
+        );
 
         /*
         |--------------------------------------------------------------------------
