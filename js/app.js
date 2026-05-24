@@ -193,6 +193,15 @@ function renderCalendar() {
     return;
   }
 
+  if (!monthLabel) {
+
+    console.error(
+      '#month-label not found'
+    );
+
+    return;
+  }
+
   calendar.innerHTML = '';
 
   const year =
