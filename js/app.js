@@ -39,6 +39,15 @@ const prevBtn =
 const nextBtn =
   document.getElementById('next-btn');
 
+const monthViewBtn =
+  document.getElementById('month-view-btn');
+
+const weekViewBtn =
+  document.getElementById('week-view-btn');
+
+const dayViewBtn =
+  document.getElementById('day-view-btn');
+
 const offlineBanner =
   document.getElementById('offline-banner');
 
@@ -58,6 +67,8 @@ let currentDate =
 let events = [];
 
 let selectedEvent = null;
+
+let currentView = 'month';
 
 /*
 |--------------------------------------------------------------------------
@@ -190,6 +201,28 @@ async function loadEvents() {
 */
 
 function renderCalendar() {
+
+  if (
+    currentView === 'month'
+  ) {
+
+    renderMonthView();
+
+  } else if (
+    currentView === 'week'
+  ) {
+
+    renderWeekView();
+
+  } else if (
+    currentView === 'day'
+  ) {
+
+    renderDayView();
+  }
+}
+
+function renderMonthView() {
 
   if (!calendar) {
 
@@ -428,6 +461,281 @@ function renderCalendar() {
       cell
     );
   }
+}
+
+
+function renderWeekView() {
+
+  calendar.innerHTML = '';
+
+  const start =
+    new Date(currentDate);
+
+  start.setDate(
+    currentDate.getDate() -
+    currentDate.getDay()
+  );
+
+  monthLabel.textContent =
+    'Week View';
+
+  const weekGrid =
+    document.createElement(
+      'div'
+    );
+
+  weekGrid.className =
+    'week-grid';
+
+  for (
+
+    let i = 0;
+
+    i < 7;
+
+    i++
+
+  ) {
+
+    const dayDate =
+      new Date(start);
+
+    dayDate.setDate(
+      start.getDate() + i
+    );
+
+    const year =
+      dayDate.getFullYear();
+
+    const month =
+      String(
+        dayDate.getMonth() + 1
+      ).padStart(2, '0');
+
+    const day =
+      String(
+        dayDate.getDate()
+      ).padStart(2, '0');
+
+    const dateString =
+      `${year}-${month}-${day}`;
+
+    const column =
+      document.createElement(
+        'div'
+      );
+
+    column.className =
+      'week-column';
+
+    const header =
+      document.createElement(
+        'div'
+      );
+
+    header.className =
+      'week-header';
+
+    header.textContent =
+      dayDate.toLocaleDateString(
+        'default',
+        {
+          weekday: 'short',
+          day: 'numeric'
+        }
+      );
+
+    column.appendChild(
+      header
+    );
+
+    const dayEvents =
+
+      events.filter(
+
+        event =>
+
+          event.event_date ===
+          dateString
+      );
+
+    dayEvents.forEach(
+
+      event => {
+
+        const item =
+          document.createElement(
+            'div'
+          );
+
+        item.className =
+          'event-item';
+
+        item.textContent =
+          [
+            event.event_time,
+            event.title
+          ]
+
+          .filter(Boolean)
+
+          .join(' - ');
+
+        column.appendChild(
+          item
+        );
+      }
+    );
+
+    weekGrid.appendChild(
+      column
+    );
+  }
+
+  calendar.appendChild(
+    weekGrid
+  );
+}
+
+function renderDayView() {
+
+  calendar.innerHTML = '';
+
+  const year =
+    currentDate.getFullYear();
+
+  const month =
+    String(
+      currentDate.getMonth() + 1
+    ).padStart(2, '0');
+
+  const day =
+    String(
+      currentDate.getDate()
+    ).padStart(2, '0');
+
+  const dateString =
+    `${year}-${month}-${day}`;
+
+  monthLabel.textContent =
+    currentDate.toLocaleDateString(
+      'default',
+      {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric'
+      }
+    );
+
+  const dayContainer =
+    document.createElement(
+      'div'
+    );
+
+  dayContainer.className =
+    'day-view';
+
+  for (
+
+    let hour = 0;
+
+    hour < 24;
+
+    hour++
+
+  ) {
+
+    const row =
+      document.createElement(
+        'div'
+      );
+
+    row.className =
+      'hour-row';
+
+    const label =
+      document.createElement(
+        'div'
+      );
+
+    label.className =
+      'hour-label';
+
+    label.textContent =
+      `${hour}:00`;
+
+    const eventsContainer =
+      document.createElement(
+        'div'
+      );
+
+    eventsContainer.className =
+      'hour-events';
+
+    const hourEvents =
+
+      events.filter(
+
+        event => {
+
+          return (
+
+            event.event_date ===
+            dateString &&
+
+            event.event_time &&
+
+            parseInt(
+              event.event_time
+            ) === hour
+          );
+        }
+      );
+
+    hourEvents.forEach(
+
+      event => {
+
+        const item =
+          document.createElement(
+            'div'
+          );
+
+        item.className =
+          'event-item';
+
+        item.textContent =
+          [
+            event.event_time,
+            event.title
+          ]
+
+          .filter(Boolean)
+
+          .join(' - ');
+
+        eventsContainer.appendChild(
+          item
+        );
+      }
+    );
+
+    row.appendChild(
+      label
+    );
+
+    row.appendChild(
+      eventsContainer
+    );
+
+    dayContainer.appendChild(
+      row
+    );
+  }
+
+  calendar.appendChild(
+    dayContainer
+  );
 }
 
 
@@ -943,6 +1251,31 @@ nextBtn.addEventListener(
       currentDate.getMonth() + 1
     );
 
+    renderCalendar();
+  }
+);
+
+
+monthViewBtn.addEventListener(
+  'click',
+  () => {
+    currentView = 'month';
+    renderCalendar();
+  }
+);
+
+weekViewBtn.addEventListener(
+  'click',
+  () => {
+    currentView = 'week';
+    renderCalendar();
+  }
+);
+
+dayViewBtn.addEventListener(
+  'click',
+  () => {
+    currentView = 'day';
     renderCalendar();
   }
 );

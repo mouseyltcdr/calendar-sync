@@ -81,6 +81,69 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.week-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(7, 1fr);
+
+  gap: 1rem;
+}
+
+.week-column {
+
+  background: white;
+
+  border-radius: 12px;
+
+  padding: 1rem;
+
+  min-height: 500px;
+}
+
+.week-header {
+
+  font-weight: bold;
+
+  margin-bottom: 1rem;
+}
+
+.day-view {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 0.5rem;
+}
+
+.hour-row {
+
+  display: flex;
+
+  border-bottom:
+    1px solid #ddd;
+
+  min-height: 60px;
+}
+
+.hour-label {
+
+  width: 80px;
+
+  font-weight: bold;
+
+  padding: 0.5rem;
+}
+
+.hour-events {
+
+  flex: 1;
+
+  padding: 0.5rem;
+}
+
 .event-item {
   background: #2563eb;
   color: white;
