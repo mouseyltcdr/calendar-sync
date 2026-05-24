@@ -293,23 +293,30 @@ function renderCalendar() {
     cell.className =
       'calendar-cell';
 
+    const paddedMonth =
+      String(month + 1)
+        .padStart(2, '0');
+
+    const paddedDay =
+      String(day)
+        .padStart(2, '0');
+
     const dateString =
-      new Date(
-        year,
-        month,
-        day
-      )
-
-      .toISOString()
-
-      .split('T')[0];
+      `${year}-${paddedMonth}-${paddedDay}`;
     
+      const now =
+        new Date();
+
       const today =
-        new Date()
-
-          .toISOString()
-
-          .split('T')[0];
+        `${now.getFullYear()}-${
+          String(
+            now.getMonth() + 1
+          ).padStart(2, '0')
+        }-${
+          String(
+            now.getDate()
+          ).padStart(2, '0')
+        }`;
 
       if (dateString === today) {
 
