@@ -18,6 +18,9 @@ const newEventBtn =
 const eventModal =
   document.getElementById('event-modal');
 
+const deleteEventBtn =
+  document.getElementById('delete-event-btn');  
+
 const closeModalBtn =
   document.getElementById('close-modal-btn');
 
@@ -51,6 +54,7 @@ let currentDate =
 
 let events = [];
 
+let selectedEvent = null;
 
 /*
 |--------------------------------------------------------------------------
@@ -334,7 +338,42 @@ function renderCalendar() {
           'event-item';
 
         item.textContent =
-          `${event.event_time || ''} ${event.title}`;
+          [
+            event.event_time,
+            event.title
+          ]
+
+          .filter(Boolean)
+
+          .join(' - ');
+
+        item.addEventListener(
+
+          'click',
+
+          () => {
+
+            selectedEvent = event;
+
+            document.getElementById(
+              'event-title'
+            ).value = event.title || '';
+
+            document.getElementById(
+              'event-date'
+            ).value = event.event_date || '';
+
+            document.getElementById(
+              'event-time'
+            ).value = event.event_time || '';
+
+            deleteEventBtn.classList.remove(
+              'hidden'
+            );
+
+            eventModal.showModal();
+          }
+        );
 
         cell.appendChild(
           item
@@ -411,31 +450,76 @@ eventForm.addEventListener(
         return;
       }
 
-      const { error } =
-        await supabase
+      let error;
 
-          .from('events')
+      /*
+      |--------------------------------------------------------------------------
+      | UPDATE EVENT
+      |--------------------------------------------------------------------------
+      */
 
-          .insert({
+      if (selectedEvent) {
 
-            user_id:
-              user.id,
+        const result =
+          await supabase
 
-            title,
+            .from('events')
 
-            event_date:
-              date,
+            .update({
 
-            event_time:
-              time
-          });
+              title,
+
+              event_date: date,
+
+              event_time: time
+
+            })
+
+            .eq(
+              'id',
+              selectedEvent.id
+            );
+
+        error = result.error;
+      }
+
+      /*
+      |--------------------------------------------------------------------------
+      | CREATE EVENT
+      |--------------------------------------------------------------------------
+      */
+
+      else {
+
+
+        const result =
+          await supabase
+
+            .from('events')
+
+            .insert({
+
+              user_id:
+                user.id,
+
+              title,
+
+              event_date:
+                date,
+
+              event_time:
+                time
+            });
+
+        error = result.error;
+      }
 
       if (error) {
 
         console.error(error);
 
         alert(
-          'Failed to create event.'
+          'Failed to save event.'
         );
 
         return;
@@ -446,6 +530,12 @@ eventForm.addEventListener(
       renderCalendar();
 
       eventForm.reset();
+
+      selectedEvent = null;
+
+      deleteEventBtn.classList.add(
+        'hidden'
+      );
 
       eventModal.close();
 
@@ -459,6 +549,69 @@ eventForm.addEventListener(
   }
 );
 
+deleteEventBtn.addEventListener(
+
+  'click',
+
+  async () => {
+
+    if (!selectedEvent) return;
+
+    const confirmDelete =
+      confirm(
+        'Delete this event?'
+      );
+
+    if (!confirmDelete) return;
+
+    try {
+
+      const { error } =
+        await supabase
+
+          .from('events')
+
+          .delete()
+
+          .eq(
+            'id',
+            selectedEvent.id
+          );
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          'Failed to delete event.'
+        );
+
+        return;
+      }
+
+      selectedEvent = null;
+
+      eventForm.reset();
+
+      deleteEventBtn.classList.add(
+        'hidden'
+      );
+
+      eventModal.close();
+
+      await loadEvents();
+
+      renderCalendar();
+
+    } catch (error) {
+
+      console.error(
+        'Delete event error',
+        error
+      );
+    }
+  }
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -472,6 +625,14 @@ newEventBtn.addEventListener(
 
   () => {
 
+    selectedEvent = null;
+
+    eventForm.reset();
+
+    deleteEventBtn.classList.add(
+      'hidden'
+    );
+
     eventModal.showModal();
   }
 );
@@ -481,6 +642,14 @@ closeModalBtn.addEventListener(
   'click',
 
   () => {
+
+    selectedEvent = null;
+
+    eventForm.reset();
+
+    deleteEventBtn.classList.add(
+      'hidden'
+    );
 
     eventModal.close();
   }
@@ -742,7 +911,7 @@ nextBtn.addEventListener(
 
 supabase
 
-  .channel('events-realtime')
+  .channel('public:events')
 
   .on(
 
@@ -757,11 +926,10 @@ supabase
       table: 'events'
     },
 
-    async payload => {
+    async () => {
 
       console.log(
-        'Realtime update',
-        payload
+        'Realtime update'
       );
 
       await loadEvents();

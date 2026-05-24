@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calendar-sync-v2';
+const CACHE_NAME = 'calendar-sync-v3';
 
 const FILES_TO_CACHE = [
 
