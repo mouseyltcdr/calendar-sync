@@ -18,6 +18,9 @@ const newEventBtn =
 const eventModal =
   document.getElementById('event-modal');
 
+const modalTitle =
+  document.getElementById('modal-title');
+
 const deleteEventBtn =
   document.getElementById('delete-event-btn');  
 
@@ -202,9 +205,56 @@ async function loadEvents() {
 
 function renderCalendar() {
 
+  const weekdayRow =
+    document.querySelector(
+      '.weekday-row'
+    );
+
+  calendar.classList.remove(
+    'calendar-grid',
+    'week-view-layout',
+    'day-view-layout'
+  );
+
+  /*
+  |--------------------------------------------------------------------------
+  | SHOW/HIDE WEEKDAY HEADER
+  |--------------------------------------------------------------------------
+  */
+
+  if (
+    weekdayRow
+  ) {
+
+    if (
+      currentView === 'month'
+    ) {
+
+      weekdayRow.classList.remove(
+        'hidden'
+      );
+
+    } else {
+
+      weekdayRow.classList.add(
+        'hidden'
+      );
+    }
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | RENDER CURRENT VIEW
+  |--------------------------------------------------------------------------
+  */
+
   if (
     currentView === 'month'
   ) {
+
+    calendar.classList.add(
+      'calendar-grid'
+    );
 
     renderMonthView();
 
@@ -212,15 +262,25 @@ function renderCalendar() {
     currentView === 'week'
   ) {
 
+    calendar.classList.add(
+      'week-view-layout'
+    );
+
     renderWeekView();
 
   } else if (
     currentView === 'day'
   ) {
 
+    calendar.classList.add(
+      'day-view-layout'
+    );
+
     renderDayView();
   }
+
 }
+
 
 function renderMonthView() {
 
@@ -445,7 +505,7 @@ function renderMonthView() {
               'hidden'
             );
 
-            newEventBtn.textContent = 'Edit Event';
+            modalTitle.textContent = 'Edit Event';
             
             eventModal.showModal();
           }
@@ -476,8 +536,27 @@ function renderWeekView() {
     currentDate.getDay()
   );
 
+  const end =
+    new Date(start);
+
+  end.setDate(
+    start.getDate() + 6
+  );
+
   monthLabel.textContent =
-    'Week View';
+    `${start.toLocaleDateString(
+      'default',
+      {
+        month: 'short',
+        day: 'numeric'
+      }
+    )} - ${end.toLocaleDateString(
+      'default',
+      {
+        month: 'short',
+        day: 'numeric'
+      }
+    )}`;
 
   const weekGrid =
     document.createElement(
@@ -551,13 +630,28 @@ function renderWeekView() {
 
     const dayEvents =
 
-      events.filter(
+      events
 
-        event =>
+        .filter(
 
-          event.event_date ===
-          dateString
-      );
+          event =>
+
+            event.event_date ===
+            dateString
+        )
+
+        .sort(
+
+          (a, b) => {
+
+            return (
+              (a.event_time || '')
+                .localeCompare(
+                  b.event_time || ''
+                )
+            );
+          }
+        );
 
     dayEvents.forEach(
 
@@ -622,8 +716,8 @@ function renderDayView() {
       'default',
       {
         weekday: 'long',
-        month: 'long',
-        day: 'numeric'
+        day: 'numeric',
+        month: 'long'
       }
     );
 
@@ -674,23 +768,38 @@ function renderDayView() {
 
     const hourEvents =
 
-      events.filter(
+      events
 
-        event => {
+        .filter(
 
-          return (
+          event => {
 
-            event.event_date ===
-            dateString &&
+            return (
 
-            event.event_time &&
+              event.event_date ===
+              dateString &&
 
-            parseInt(
-              event.event_time
-            ) === hour
-          );
-        }
-      );
+              event.event_time &&
+
+              parseInt(
+                event.event_time
+              ) === hour
+            );
+          }
+        )
+
+        .sort(
+
+          (a, b) => {
+
+            return (
+              (a.event_time || '')
+                .localeCompare(
+                  b.event_time || ''
+                )
+            );
+          }
+        );
 
     hourEvents.forEach(
 
@@ -984,7 +1093,7 @@ newEventBtn.addEventListener(
       'hidden'
     );
 
-    newEventBtn.textContent = 'Create Event';
+    modalTitle.textContent = 'Create Event';
 
     eventModal.showModal();
   }
@@ -1233,9 +1342,26 @@ prevBtn.addEventListener(
 
   () => {
 
-    currentDate.setMonth(
-      currentDate.getMonth() - 1
-    );
+    if (currentView === 'month') {
+
+      currentDate.setMonth(
+        currentDate.getMonth() - 1
+      );
+
+    } else if (
+      currentView === 'week'
+    ) {
+
+      currentDate.setDate(
+        currentDate.getDate() - 7
+      );
+
+    } else {
+
+      currentDate.setDate(
+        currentDate.getDate() - 1
+      );
+    }
 
     renderCalendar();
   }
@@ -1247,38 +1373,64 @@ nextBtn.addEventListener(
 
   () => {
 
-    currentDate.setMonth(
-      currentDate.getMonth() + 1
-    );
+    if (currentView === 'month') {
+
+      currentDate.setMonth(
+        currentDate.getMonth() + 1
+      );
+
+    } else if (
+      currentView === 'week'
+    ) {
+
+      currentDate.setDate(
+        currentDate.getDate() + 7
+      );
+
+    } else {
+
+      currentDate.setDate(
+        currentDate.getDate() + 1
+      );
+    }
 
     renderCalendar();
   }
 );
 
 
-monthViewBtn.addEventListener(
-  'click',
-  () => {
-    currentView = 'month';
-    renderCalendar();
-  }
-);
+if (monthViewBtn) {
 
-weekViewBtn.addEventListener(
-  'click',
-  () => {
-    currentView = 'week';
-    renderCalendar();
-  }
-);
+  monthViewBtn.addEventListener(
+    'click',
+    () => {
+      currentView = 'month';
+      renderCalendar();
+    }
+  );
+}
 
-dayViewBtn.addEventListener(
-  'click',
-  () => {
-    currentView = 'day';
-    renderCalendar();
-  }
-);
+if (weekViewBtn) {
+  
+  weekViewBtn.addEventListener(
+    'click',
+    () => {
+      currentView = 'week';
+      renderCalendar();
+    }
+  );
+}
+
+if (dayViewBtn) {
+
+  dayViewBtn.addEventListener(
+    'click',
+    () => {
+      currentView = 'day';
+      renderCalendar();
+    }
+  );
+}
 
 
 /*

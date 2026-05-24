@@ -1,5 +1,5 @@
 const CACHE_NAME =
-  'calendar-sync-v6';
+  'calendar-sync-v7';
 
 const ASSETS = [
 
