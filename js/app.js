@@ -54,6 +54,9 @@ const dayViewBtn =
 const offlineBanner =
   document.getElementById('offline-banner');
 
+const searchInput =
+  document.getElementById('event-search');
+
 const loadingOverlay =
   document.getElementById('loading-overlay');
 
@@ -64,6 +67,9 @@ const loadingOverlay =
 |--------------------------------------------------------------------------
 */
 
+let searchQuery = '';
+let filteredEvents = [];
+
 let currentDate =
   new Date();
 
@@ -72,6 +78,44 @@ let events = [];
 let selectedEvent = null;
 
 let currentView = 'month';
+
+
+/*
+|--------------------------------------------------------------------------
+| FILTERED EVENTS
+|--------------------------------------------------------------------------
+*/
+
+function getVisibleEvents() {
+
+  if (!searchQuery.trim()) {
+
+    return events;
+  }
+
+  const query =
+    searchQuery.toLowerCase();
+
+  return events.filter(event => {
+
+    return (
+
+      event.title
+        ?.toLowerCase()
+        .includes(query)
+
+      ||
+
+      event.event_date
+        ?.includes(query)
+
+      ||
+
+      event.event_time
+        ?.includes(query)
+    );
+  });
+}
 
 function updateViewButtons() {
 
@@ -111,6 +155,73 @@ function updateViewButtons() {
       'active-view'
     );
   }
+}
+
+
+
+/*
+|--------------------------------------------------------------------------
+| SEARCH
+|--------------------------------------------------------------------------
+*/
+
+if (searchInput) {
+
+  searchInput.addEventListener(
+
+    'input',
+
+    event => {
+
+      searchQuery =
+        event.target.value;
+
+      renderCalendar();
+    }
+  );
+}
+
+/*
+|--------------------------------------------------------------------------
+| FILTERED EVENTS
+|--------------------------------------------------------------------------
+*/
+
+function getVisibleEvents() {
+
+  if (!searchQuery.trim()) {
+
+    return events;
+  }
+
+  const query =
+    searchQuery.toLowerCase();
+
+  return events.filter(event => {
+
+    return (
+
+      event.title
+        ?.toLowerCase()
+        .includes(query)
+
+      ||
+
+      event.event_date
+        ?.includes(query)
+
+      ||
+
+      event.event_time
+        ?.includes(query)
+    );
+  });
+}
+
+
+function hasVisibleEvents() {
+
+  return getVisibleEvents().length > 0;
 }
 
 /*
@@ -284,6 +395,25 @@ function renderCalendar() {
     }
   }
 
+  if (!hasVisibleEvents()) {
+
+    calendar.innerHTML = `
+
+      <div class="empty-state">
+
+        <h3>No matching events</h3>
+
+        <p>Try another search.</p>
+
+      </div>
+    `;
+
+    return;
+  }
+  
+  
+  
+  
   /*
   |--------------------------------------------------------------------------
   | RENDER CURRENT VIEW
@@ -476,9 +606,11 @@ function renderMonthView() {
     );
 
 
+    const visibleEvents = getVisibleEvents();
+
     const dayEvents =
 
-      events
+      visibleEvents
 
         .filter(
 
@@ -670,9 +802,12 @@ function renderWeekView() {
       header
     );
 
+    
+    const visibleEvents = getVisibleEvents();
+    
     const dayEvents =
 
-      events
+      visibleEvents
 
         .filter(
 
@@ -808,9 +943,11 @@ function renderDayView() {
     eventsContainer.className =
       'hour-events';
 
+    const visibleEvents = getVisibleEvents();
+    
     const hourEvents =
 
-      events
+      visibleEvents
 
         .filter(
 
@@ -1470,6 +1607,44 @@ if (dayViewBtn) {
     () => {
       currentView = 'day';
       renderCalendar();
+    }
+  );
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| SEARCH
+|--------------------------------------------------------------------------
+*/
+
+if (searchInput) {
+
+  let searchTimeout;
+
+  searchInput.addEventListener(
+
+    'input',
+
+    event => {
+
+      clearTimeout(
+        searchTimeout
+      );
+
+      searchTimeout = setTimeout(
+
+        () => {
+
+          searchQuery =
+            event.target.value;
+
+          renderCalendar();
+
+        },
+
+        200
+      );
     }
   );
 }

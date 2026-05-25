@@ -21,11 +21,33 @@ body {
 
 .topbar {
   display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
   background: #2563eb;
   color: white;
+}
+
+.toolbar-search {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 16px;
+  background: white;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #4f46e5;
 }
 
 .app-layout {
@@ -431,13 +453,30 @@ body {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
 
   .app-layout {
 
     grid-template-columns: 1fr;
   }
 
+  .topbar {
+    
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+
+  .topbar-actions {
+
+    display: flex;
+
+    gap: 8px;
+  }
+  
+  
+  
   .sidebar {
 
     border-right: none;
