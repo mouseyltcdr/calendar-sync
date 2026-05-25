@@ -68,7 +68,6 @@ const loadingOverlay =
 */
 
 let searchQuery = '';
-let filteredEvents = [];
 
 let currentDate =
   new Date();
@@ -159,64 +158,7 @@ function updateViewButtons() {
 
 
 
-/*
-|--------------------------------------------------------------------------
-| SEARCH
-|--------------------------------------------------------------------------
-*/
 
-if (searchInput) {
-
-  searchInput.addEventListener(
-
-    'input',
-
-    event => {
-
-      searchQuery =
-        event.target.value;
-
-      renderCalendar();
-    }
-  );
-}
-
-/*
-|--------------------------------------------------------------------------
-| FILTERED EVENTS
-|--------------------------------------------------------------------------
-*/
-
-function getVisibleEvents() {
-
-  if (!searchQuery.trim()) {
-
-    return events;
-  }
-
-  const query =
-    searchQuery.toLowerCase();
-
-  return events.filter(event => {
-
-    return (
-
-      event.title
-        ?.toLowerCase()
-        .includes(query)
-
-      ||
-
-      event.event_date
-        ?.includes(query)
-
-      ||
-
-      event.event_time
-        ?.includes(query)
-    );
-  });
-}
 
 
 function hasVisibleEvents() {
@@ -357,6 +299,9 @@ async function loadEvents() {
 function renderCalendar() {
 
   updateViewButtons();
+
+  const visibleEvents =
+    getVisibleEvents();
   
   const weekdayRow =
     document.querySelector(
@@ -395,21 +340,7 @@ function renderCalendar() {
     }
   }
 
-  if (!hasVisibleEvents()) {
-
-    calendar.innerHTML = `
-
-      <div class="empty-state">
-
-        <h3>No matching events</h3>
-
-        <p>Try another search.</p>
-
-      </div>
-    `;
-
-    return;
-  }
+  
   
   
   
@@ -428,7 +359,7 @@ function renderCalendar() {
       'calendar-grid'
     );
 
-    renderMonthView();
+    renderMonthView(visibleEvents);
 
   } else if (
     currentView === 'week'
@@ -438,7 +369,7 @@ function renderCalendar() {
       'week-view-layout'
     );
 
-    renderWeekView();
+    renderWeekView(visibleEvents);
 
   } else if (
     currentView === 'day'
@@ -448,13 +379,13 @@ function renderCalendar() {
       'day-view-layout'
     );
 
-    renderDayView();
+    renderDayView(visibleEvents);
   }
 
 }
 
 
-function renderMonthView() {
+function renderMonthView(visibleEvents) {
 
   if (!calendar) {
 
@@ -606,7 +537,6 @@ function renderMonthView() {
     );
 
 
-    const visibleEvents = getVisibleEvents();
 
     const dayEvents =
 
@@ -694,11 +624,28 @@ function renderMonthView() {
     calendar.appendChild(
       cell
     );
+
+    if (
+      visibleEvents.length === 0 &&
+      day === 1
+    ) {
+
+      const empty =
+        document.createElement('div');
+
+      empty.className =
+        'calendar-empty-message';
+
+      empty.textContent =
+        'No matching events';
+
+      calendar.appendChild(empty);
+    }
   }
 }
 
 
-function renderWeekView() {
+function renderWeekView(visibleEvents) {
 
   calendar.innerHTML = '';
 
@@ -803,7 +750,6 @@ function renderWeekView() {
     );
 
     
-    const visibleEvents = getVisibleEvents();
     
     const dayEvents =
 
@@ -866,9 +812,23 @@ function renderWeekView() {
   calendar.appendChild(
     weekGrid
   );
+
+  if (visibleEvents.length === 0) {
+
+    const empty =
+      document.createElement('div');
+
+    empty.className =
+      'calendar-empty-message';
+
+    empty.textContent =
+      'No matching events';
+
+    calendar.appendChild(empty);
+  }
 }
 
-function renderDayView() {
+function renderDayView(visibleEvents) {
 
   calendar.innerHTML = '';
 
@@ -943,7 +903,7 @@ function renderDayView() {
     eventsContainer.className =
       'hour-events';
 
-    const visibleEvents = getVisibleEvents();
+    
     
     const hourEvents =
 
@@ -1024,6 +984,20 @@ function renderDayView() {
   calendar.appendChild(
     dayContainer
   );
+
+  if (visibleEvents.length === 0) {
+
+    const empty =
+      document.createElement('div');
+
+    empty.className =
+      'calendar-empty-message';
+
+    empty.textContent =
+      'No matching events';
+
+    calendar.appendChild(empty);
+  }
 }
 
 

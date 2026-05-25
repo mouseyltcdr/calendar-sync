@@ -81,6 +81,13 @@ body {
   overflow-x: auto;
 }
 
+.calendar-empty-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
 .month-controls {
   display: flex;
   align-items: center;
