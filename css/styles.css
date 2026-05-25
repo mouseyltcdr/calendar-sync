@@ -69,16 +69,7 @@ body {
   margin-top: 0.5rem;
 }
 
-.view-buttons {
 
-  display: flex;
-
-  gap: 0.5rem;
-
-  justify-content: center;
-
-  flex-wrap: wrap;
-}
 
 #month-label {
 
@@ -280,6 +271,76 @@ body {
   padding: 0.75rem 1rem;
   border-radius: 8px;
   cursor: pointer;
+}
+
+.view-switcher {
+
+  display: flex;
+
+  align-items: center;
+
+  background: #eef2ff;
+
+  border-radius: 12px;
+
+  padding: 4px;
+
+  gap: 4px;
+
+  width: fit-content;
+
+  margin: 0 auto;
+}
+
+.view-btn {
+
+  border: none;
+
+  background: transparent;
+
+  color: #4b5563;
+
+  padding: 8px 14px;
+
+  border-radius: 8px;
+
+  font-size: 0.9rem;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.view-btn:hover {
+
+  background: rgba(
+    37,
+    99,
+    235,
+    0.08
+  );
+
+  color: #2563eb;
+}
+
+.active-view {
+
+  background: white;
+
+  color: #2563eb;
+
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.08);
+}
+
+.view-btn:active {
+
+  transform: scale(0.97);
 }
 
 #prev-btn,

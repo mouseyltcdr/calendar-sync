@@ -73,6 +73,46 @@ let selectedEvent = null;
 
 let currentView = 'month';
 
+function updateViewButtons() {
+
+  document
+    .querySelectorAll('.view-btn')
+
+    .forEach(button => {
+
+      button.classList.remove(
+        'active-view'
+      );
+    });
+
+  if (
+    currentView === 'month'
+  ) {
+
+    monthViewBtn.classList.add(
+      'active-view'
+    );
+  }
+
+  if (
+    currentView === 'week'
+  ) {
+
+    weekViewBtn.classList.add(
+      'active-view'
+    );
+  }
+
+  if (
+    currentView === 'day'
+  ) {
+
+    dayViewBtn.classList.add(
+      'active-view'
+    );
+  }
+}
+
 /*
 |--------------------------------------------------------------------------
 | LOADING
@@ -205,6 +245,8 @@ async function loadEvents() {
 
 function renderCalendar() {
 
+  updateViewButtons();
+  
   const weekdayRow =
     document.querySelector(
       '.weekday-row'
